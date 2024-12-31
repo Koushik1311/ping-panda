@@ -6,8 +6,16 @@ import DashboardPageContent from "./DashboardPageContent"
 import CreateEventCategoryModel from "@/components/dashboard/CreateEventCategoryModel"
 import { Button } from "@/components/ui/button"
 import { PlusIcon } from "lucide-react"
+import { createCheckoutSession } from "@/lib/stripe"
+import PaymentSuccessModel from "@/components/dashboard/PaymentSuccessModel"
 
-export default async function Page() {
+interface PageProps {
+  searchParams: {
+    [key: string]: string | string[] | undefined
+  }
+}
+
+export default async function Page({ searchParams }: PageProps) {
   const auth = await currentUser()
 
   if (!auth) {
@@ -22,19 +30,36 @@ export default async function Page() {
     redirect("/sign-in")
   }
 
+  const intent = searchParams.intent
+
+  if (intent === "upgrade") {
+    const session = await createCheckoutSession({
+      userEmail: user.email,
+      userId: user.id,
+    })
+
+    if (session.url) redirect(session.url)
+  }
+
+  const success = searchParams.success
+
   return (
-    <DashboardPage
-      cta={
-        <CreateEventCategoryModel>
-          <Button className="w-full sm:w-fit">
-            <PlusIcon className="size-4 mr-2" />
-            Add Category
-          </Button>
-        </CreateEventCategoryModel>
-      }
-      title="Dashboard"
-    >
-      <DashboardPageContent />
-    </DashboardPage>
+    <>
+      {success ? <PaymentSuccessModel /> : null}
+
+      <DashboardPage
+        cta={
+          <CreateEventCategoryModel>
+            <Button className="w-full sm:w-fit">
+              <PlusIcon className="size-4 mr-2" />
+              Add Category
+            </Button>
+          </CreateEventCategoryModel>
+        }
+        title="Dashboard"
+      >
+        <DashboardPageContent />
+      </DashboardPage>
+    </>
   )
 }
