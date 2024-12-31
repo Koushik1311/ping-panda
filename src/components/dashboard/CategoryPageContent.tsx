@@ -61,10 +61,6 @@ export default function CategoryPageContent({
     initialData: { hasEvents: initialHasEvents },
   })
 
-  if (!pollingData.hasEvents) {
-    return <EmptyCategoryState categoryName={category.name} />
-  }
-
   const { data, isFetching } = useQuery({
     queryKey: [
       "events",
@@ -252,6 +248,10 @@ export default function CategoryPageContent({
         </Card>
       )
     })
+  }
+
+  if (!pollingData.hasEvents) {
+    return <EmptyCategoryState categoryName={category.name} />
   }
 
   return (

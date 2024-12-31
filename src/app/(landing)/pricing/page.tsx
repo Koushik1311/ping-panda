@@ -9,7 +9,7 @@ import { useMutation } from "@tanstack/react-query"
 import { CheckIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
 
-export default function page() {
+export default function Page() {
   const { user } = useUser()
   const router = useRouter()
 
